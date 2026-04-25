@@ -39,6 +39,7 @@ def _load_image_from_base64(data_url: str) -> np.ndarray:
 # =========================
 # IMAGE PREDICTION CORE
 # =========================
+@eel.expose
 def predict_image(img_source):
     if isinstance(img_source, str) and img_source.startswith("data:"):
         img = _load_image_from_base64(img_source)
@@ -150,10 +151,14 @@ def process_file(file_path):
 def select_file():
     root = tk.Tk()
     root.withdraw()
+    root.wm_attributes('-topmost', 1)  # <--- Add this line
     file_path = filedialog.askopenfilename(
+        parent=root,                   # <--- Add this too
         title="Select Image or Video",
         filetypes=[("Media Files", "*.jpg *.jpeg *.png *.mp4 *.avi *.mov")]
     )
+
+    root.destroy()                     # Cleanup the root window
     return file_path
 
 

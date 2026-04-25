@@ -1,54 +1,272 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
+  <head>
     <meta charset="UTF-8" />
-    <title>FauxSight</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FauxSight | AI Detection Lab</title>
     <style>
-        body { font-family: Arial, sans-serif; display: flex; flex-direction: column; align-items: center; padding: 40px; background: #f5f7fb; color: #222; }
-        .card { background: white; border-radius: 12px; box-shadow: 0 12px 30px rgba(0,0,0,0.08); padding: 28px; width: min(600px, 100%); }
-        h1 { margin-top: 0; }
-        #preview { max-width: 100%; border-radius: 8px; margin-top: 16px; }
-        .result { margin-top: 24px; font-size: 1.1rem; }
-        .badge { display: inline-block; padding: 10px 16px; border-radius: 999px; background: #eef3ff; color: #1f3bb3; margin-top: 10px; }
-        input[type=file] { margin-top: 16px; }
+      :root {
+        --primary: #1f3bb3;
+        --accent: #4b63d6;
+        --bg: #f5f7fb;
+        --text: #2d3748;
+        --success: #48bb78;
+        --danger: #f56565;
+      }
+
+      body {
+        font-family: "Segoe UI", system-ui, sans-serif;
+        background: var(--bg);
+        color: var(--text);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        margin: 0;
+      }
+
+      .card {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        padding: 32px;
+        width: 100%;
+        max-width: 700px;
+        text-align: center;
+      }
+
+      h1 {
+        color: var(--primary);
+        margin-bottom: 8px;
+      }
+      p {
+        color: #718096;
+        margin-bottom: 24px;
+      }
+
+      .upload-container {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+        margin-bottom: 20px;
+      }
+
+      .drop-zone {
+        border: 2px dashed #cbd5e0;
+        padding: 20px;
+        border-radius: 12px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        background: #fff;
+      }
+
+      .drop-zone:hover {
+        border-color: var(--primary);
+        background: #f0f4ff;
+      }
+
+      .preview-box {
+        margin-top: 20px;
+        border-radius: 12px;
+        overflow: hidden;
+        background: #edf2f7;
+        display: none; /* Hidden by default */
+        max-height: 350px;
+      }
+
+      #preview-img,
+      #preview-vid {
+        max-width: 100%;
+        max-height: 350px;
+        display: block;
+        margin: 0 auto;
+      }
+
+      .result-area {
+        margin-top: 25px;
+        padding: 20px;
+        border-radius: 12px;
+        min-height: 100px;
+        background: #f8fafc;
+      }
+
+      .badge {
+        display: inline-block;
+        padding: 8px 24px;
+        border-radius: 50px;
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        margin-bottom: 10px;
+      }
+
+      .badge-ai {
+        background: var(--danger);
+        color: white;
+      }
+      .badge-real {
+        background: var(--success);
+        color: white;
+      }
+
+      .confidence-bar {
+        height: 8px;
+        background: #e2e8f0;
+        border-radius: 4px;
+        margin: 10px auto;
+        width: 80%;
+        overflow: hidden;
+      }
+
+      #bar-fill {
+        height: 100%;
+        background: var(--primary);
+        width: 0%;
+        transition: width 0.5s ease;
+      }
+
+      .loader {
+        border: 4px solid #f3f3f3;
+        border-top: 4px solid var(--primary);
+        border-radius: 50%;
+        width: 30px;
+        height: 30px;
+        animation: spin 1s linear infinite;
+        display: inline-block;
+        vertical-align: middle;
+        margin-right: 10px;
+      }
+
+      @keyframes spin {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      button {
+        background: var(--primary);
+        color: white;
+        border: none;
+        padding: 12px 20px;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        width: 100%;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <div class="card">
-        <h1>FauxSight</h1>
-        <p>Upload an image and detect whether it looks AI-generated or real.</p>
-        <input id="fileInput" type="file" accept="image/*" />
-        <img id="preview" src="" alt="Image preview" hidden />
-        <div class="result" id="result"></div>
+      <h1>FauxSight</h1>
+      <p>Image & Video Authenticity Verifier</p>
+
+      <div class="upload-container">
+        <div class="drop-zone" onclick="selectAndProcess()">
+          <strong>📁 Open File</strong>
+          <div style="font-size: 0.75rem; color: #a0aec0; margin-top: 5px">
+            Supports JPG, PNG, MP4, MOV
+          </div>
+        </div>
+      </div>
+
+      <div id="preview-container" class="preview-box">
+        <img id="preview-img" alt="Preview Image" style="display: none" />
+        <div
+          id="video-notice"
+          style="display: none; padding: 20px; color: #4a5568"
+        >
+          🎥 Video Loaded: <span id="video-name"></span>
+        </div>
+      </div>
+
+      <div class="result-area" id="result-area">
+        <div id="status-text">Waiting for input...</div>
+      </div>
     </div>
 
     <script type="text/javascript" src="eel.js"></script>
     <script>
-        const fileInput = document.getElementById('fileInput');
-        const resultBox = document.getElementById('result');
-        const preview = document.getElementById('preview');
+      const statusText = document.getElementById("status-text");
+      const resultArea = document.getElementById("result-area");
+      const previewImg = document.getElementById("preview-img");
+      const videoNotice = document.getElementById("video-notice");
+      const previewContainer = document.getElementById("preview-container");
 
-        fileInput.addEventListener('change', async (event) => {
-            const file = event.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = async () => {
-                const dataUrl = reader.result;
-                preview.src = dataUrl;
-                preview.hidden = false;
-                resultBox.textContent = 'Analyzing...';
-                try {
-                    const result = await eel.predict_image(dataUrl)();
-                    resultBox.innerHTML = `
-                        <div class="badge">${result.label}</div>
-                        <div>Confidence: ${result.confidence}</div>
-                    `;
-                } catch (error) {
-                    resultBox.textContent = 'Prediction failed: ' + error;
-                }
-            };
-            reader.readAsDataURL(file);
-        });
+      async function selectAndProcess() {
+        // 1. Open the Python File Picker
+        const filePath = await eel.select_file()();
+        if (!filePath) return;
+
+        // 2. Prepare UI
+        resetUI();
+        statusText.innerHTML = `<div class="loader"></div> Analyzing content...`;
+
+        try {
+          // 3. Request Processing
+          const result = await eel.process_file(filePath)();
+
+          if (result.error) {
+            statusText.innerHTML = `<b style="color:red">Error: ${result.error}</b>`;
+            return;
+          }
+
+          // 4. Handle Visual Previews
+          displayPreview(filePath, result.type);
+
+          // 5. Display Results
+          renderResult(result);
+        } catch (e) {
+          statusText.innerHTML = "System Error: " + e;
+        }
+      }
+
+      function displayPreview(path, type) {
+        previewContainer.style.display = "block";
+        if (type === "image") {
+          // Note: Realistically, you'd convert to base64 in Python to show it here
+          // For now, we show the path as the browser blocks direct local file access
+          videoNotice.style.display = "none";
+          previewImg.style.display = "block";
+          previewImg.src = "https://img.icons8.com/color/96/image.png"; // Placeholder
+          statusText.innerHTML += `<br><small>${path}</small>`;
+        } else {
+          previewImg.style.display = "none";
+          videoNotice.style.display = "block";
+          document.getElementById("video-name").textContent = path
+            .split("\\")
+            .pop();
+        }
+      }
+
+      function renderResult(res) {
+        const isAI = res.label === "AI-Generated";
+        const badgeClass = isAI ? "badge-ai" : "badge-real";
+
+        resultArea.innerHTML = `
+          <div class="badge ${badgeClass}">${res.label}</div>
+          <div style="font-size: 1.2rem; font-weight: bold;">${res.confidence} Match</div>
+          <div class="confidence-bar">
+            <div id="bar-fill" style="width: ${res.confidence}"></div>
+          </div>
+          <div style="font-size: 0.8rem; color: #718096; margin-top: 10px;">
+            Analysis Type: ${res.type.toUpperCase()}
+          </div>
+        `;
+      }
+
+      function resetUI() {
+        previewContainer.style.display = "none";
+        previewImg.style.display = "none";
+        videoNotice.style.display = "none";
+        resultArea.innerHTML = '<div id="status-text"></div>';
+      }
+
+      window.onload = () => {
+        eel.load_system()();
+      };
     </script>
-</body>
+  </body>
 </html>
