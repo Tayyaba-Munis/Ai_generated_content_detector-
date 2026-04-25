@@ -3,21 +3,27 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>FauxSight | AI Detection Lab</title>
+    <title>FauxSight | Noir Edition</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Playfair+Display:ital,wght@0,700;1,700&display=swap"
+      rel="stylesheet"
+    />
     <style>
       :root {
-        --primary: #1f3bb3;
-        --accent: #4b63d6;
-        --bg: #f5f7fb;
-        --text: #2d3748;
-        --success: #48bb78;
-        --danger: #f56565;
+        --primary: #ffffff;
+        --secondary: #a1a1a1;
+        --bg: #0a0a0a;
+        --card-bg: #121212;
+        --accent: #333333;
+        --success: #ffffff; /* Real remains clean/white */
+        --danger: #444444; /* AI-generated is deep gray */
       }
 
       body {
-        font-family: "Segoe UI", system-ui, sans-serif;
-        background: var(--bg);
-        color: var(--text);
+        font-family: "Inter", sans-serif;
+        background-color: var(--bg);
+        background-image: url("https://www.transparenttextures.com/patterns/stardust.png");
+        color: var(--primary);
         display: flex;
         justify-content: center;
         align-items: center;
@@ -26,164 +32,193 @@
       }
 
       .card {
-        background: white;
-        border-radius: 16px;
-        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-        padding: 32px;
+        background: var(--card-bg);
+        border: 1px solid var(--accent);
+        border-radius: 4px;
+        padding: 60px 40px;
         width: 100%;
-        max-width: 700px;
+        max-width: 650px;
         text-align: center;
+        box-shadow: 0 40px 100px rgba(0, 0, 0, 0.8);
       }
 
       h1 {
-        color: var(--primary);
-        margin-bottom: 8px;
-      }
-      p {
-        color: #718096;
-        margin-bottom: 24px;
-      }
-
-      .upload-container {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 15px;
-        margin-bottom: 20px;
+        font-family: "Playfair Display", serif;
+        font-size: 3.5rem;
+        font-style: italic;
+        letter-spacing: -2px;
+        margin: 0;
+        text-transform: uppercase;
       }
 
+      .subtitle {
+        font-weight: 300;
+        text-transform: uppercase;
+        letter-spacing: 4px;
+        font-size: 0.75rem;
+        color: var(--secondary);
+        margin-bottom: 40px;
+      }
+
+      /* Filmy Upload Zone */
       .drop-zone {
-        border: 2px dashed #cbd5e0;
-        padding: 20px;
-        border-radius: 12px;
+        border: 1px solid var(--accent);
+        padding: 40px;
         cursor: pointer;
-        transition: all 0.3s ease;
-        background: #fff;
+        transition: all 0.5s ease;
+        background: transparent;
+        position: relative;
       }
 
       .drop-zone:hover {
-        border-color: var(--primary);
-        background: #f0f4ff;
+        background: var(--primary);
+        color: var(--bg);
       }
 
+      .drop-zone strong {
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        font-size: 0.9rem;
+      }
+
+      /* Cinematic Preview Box */
       .preview-box {
-        margin-top: 20px;
-        border-radius: 12px;
-        overflow: hidden;
-        background: #edf2f7;
-        display: none; /* Hidden by default */
-        max-height: 350px;
+        margin-top: 30px;
+        background: #000;
+        border: 1px solid var(--accent);
+        display: none;
       }
 
       #preview-img,
       #preview-vid {
         max-width: 100%;
-        max-height: 350px;
+        filter: grayscale(100%);
         display: block;
         margin: 0 auto;
       }
 
+      /* Result Area */
       .result-area {
-        margin-top: 25px;
-        padding: 20px;
-        border-radius: 12px;
-        min-height: 100px;
-        background: #f8fafc;
+        margin-top: 40px;
+        padding: 30px;
+        border-top: 1px solid var(--accent);
       }
 
       .badge {
         display: inline-block;
-        padding: 8px 24px;
-        border-radius: 50px;
-        font-weight: 800;
+        padding: 6px 20px;
+        border: 1px solid var(--primary);
+        font-weight: 600;
         text-transform: uppercase;
-        letter-spacing: 1px;
-        margin-bottom: 10px;
+        letter-spacing: 2px;
+        font-size: 0.8rem; /* Slightly larger for short labels */
+        margin-bottom: 15px;
       }
 
+      /* Invert colors for AI */
       .badge-ai {
-        background: var(--danger);
-        color: white;
+        background: var(--primary);
+        color: var(--bg);
+        border: 1px solid var(--primary);
       }
+      /* Classic border for Real */
       .badge-real {
-        background: var(--success);
-        color: white;
+        background: transparent;
+        color: var(--primary);
+        border: 1px solid var(--primary);
       }
 
-      .confidence-bar {
-        height: 8px;
-        background: #e2e8f0;
-        border-radius: 4px;
-        margin: 10px auto;
-        width: 80%;
-        overflow: hidden;
+      .confidence-text {
+        font-family: "Playfair Display", serif;
+        font-size: 2.2rem;
+        margin-bottom: 20px;
+      }
+
+      /* The Scanning Bar */
+      .confidence-bar-wrapper {
+        background: var(--accent);
+        height: 2px;
+        width: 100%;
+        margin: 0 auto 20px auto;
+        position: relative;
       }
 
       #bar-fill {
         height: 100%;
         background: var(--primary);
         width: 0%;
-        transition: width 0.5s ease;
+        transition: width 1.5s cubic-bezier(0.65, 0, 0.35, 1);
+        box-shadow: 0 0 10px var(--primary);
       }
 
+      /* Minimalist Loader */
       .loader {
-        border: 4px solid #f3f3f3;
-        border-top: 4px solid var(--primary);
+        width: 20px;
+        height: 20px;
+        border: 2px solid var(--accent);
+        border-top: 2px solid var(--primary);
         border-radius: 50%;
-        width: 30px;
-        height: 30px;
-        animation: spin 1s linear infinite;
+        animation: spin 0.8s linear infinite;
         display: inline-block;
         vertical-align: middle;
-        margin-right: 10px;
+        margin-right: 15px;
       }
 
       @keyframes spin {
-        0% {
-          transform: rotate(0deg);
-        }
         100% {
           transform: rotate(360deg);
         }
       }
 
-      button {
-        background: var(--primary);
-        color: white;
-        border: none;
-        padding: 12px 20px;
-        border-radius: 8px;
-        font-weight: 600;
-        cursor: pointer;
-        width: 100%;
+      .analysis-type {
+        font-size: 0.65rem;
+        color: var(--secondary);
+        letter-spacing: 3px;
+        text-transform: uppercase;
+      }
+
+      #status-text {
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        color: var(--secondary);
       }
     </style>
   </head>
   <body>
     <div class="card">
       <h1>FauxSight</h1>
-      <p>Image & Video Authenticity Verifier</p>
+      <p class="subtitle">Authentication Laboratory</p>
 
       <div class="upload-container">
         <div class="drop-zone" onclick="selectAndProcess()">
-          <strong>📁 Open File</strong>
-          <div style="font-size: 0.75rem; color: #a0aec0; margin-top: 5px">
-            Supports JPG, PNG, MP4, MOV
+          <strong>[ Load Sequence ]</strong>
+          <div
+            style="font-size: 0.6rem; color: var(--secondary); margin-top: 10px"
+          >
+            SUPPORTED FORMATS: RAW / MP4 / PNG
           </div>
         </div>
       </div>
 
       <div id="preview-container" class="preview-box">
-        <img id="preview-img" alt="Preview Image" style="display: none" />
+        <img id="preview-img" alt="Frame Preview" style="display: none" />
         <div
           id="video-notice"
-          style="display: none; padding: 20px; color: #4a5568"
+          style="
+            display: none;
+            padding: 20px;
+            font-size: 0.8rem;
+            letter-spacing: 1px;
+          "
         >
-          🎥 Video Loaded: <span id="video-name"></span>
+          DECODING VIDEO:
+          <span id="video-name" style="color: var(--primary)"></span>
         </div>
       </div>
 
       <div class="result-area" id="result-area">
-        <div id="status-text">Waiting for input...</div>
+        <div id="status-text">System Idle...</div>
       </div>
     </div>
 
@@ -196,42 +231,41 @@
       const previewContainer = document.getElementById("preview-container");
 
       async function selectAndProcess() {
-        // 1. Open the Python File Picker
+        // 1. Trigger the Python Tkinter File Picker
         const filePath = await eel.select_file()();
-        if (!filePath) return;
+        if (!filePath) return; // User cancelled
 
-        // 2. Prepare UI
+        // 2. Prepare UI for analysis
         resetUI();
-        statusText.innerHTML = `<div class="loader"></div> Analyzing content...`;
+        statusText.innerHTML = `<div class="loader"></div> ANALYZING METADATA...`;
 
         try {
-          // 3. Request Processing
+          // 3. Process the file via Python
           const result = await eel.process_file(filePath)();
 
           if (result.error) {
-            statusText.innerHTML = `<b style="color:red">Error: ${result.error}</b>`;
+            statusText.innerHTML = `ERROR: ${result.error}`;
             return;
           }
 
           // 4. Handle Visual Previews
           displayPreview(filePath, result.type);
 
-          // 5. Display Results
+          // 5. Display Results with new labels
           renderResult(result);
         } catch (e) {
-          statusText.innerHTML = "System Error: " + e;
+          statusText.innerHTML = "FATAL ERROR: " + e;
         }
       }
 
       function displayPreview(path, type) {
         previewContainer.style.display = "block";
         if (type === "image") {
-          // Note: Realistically, you'd convert to base64 in Python to show it here
-          // For now, we show the path as the browser blocks direct local file access
           videoNotice.style.display = "none";
           previewImg.style.display = "block";
-          previewImg.src = "https://img.icons8.com/color/96/image.png"; // Placeholder
-          statusText.innerHTML += `<br><small>${path}</small>`;
+          // Placeholder icon is static, can't show AI/Real here easily
+          previewImg.src =
+            "https://img.icons8.com/ios-filled/100/ffffff/film-reel.png";
         } else {
           previewImg.style.display = "none";
           videoNotice.style.display = "block";
@@ -242,17 +276,21 @@
       }
 
       function renderResult(res) {
+        // Assume 'AI-Generated' is the label coming from main.py
         const isAI = res.label === "AI-Generated";
         const badgeClass = isAI ? "badge-ai" : "badge-real";
 
+        // **NEW LABELS HERE**
+        const labelText = isAI ? "AI" : "REAL";
+
         resultArea.innerHTML = `
-          <div class="badge ${badgeClass}">${res.label}</div>
-          <div style="font-size: 1.2rem; font-weight: bold;">${res.confidence} Match</div>
-          <div class="confidence-bar">
-            <div id="bar-fill" style="width: ${res.confidence}"></div>
+          <div class="badge ${badgeClass}">${labelText}</div>
+          <div class="confidence-text">${res.confidence} Integrity</div>
+          <div class="confidence-bar-wrapper">
+              <div id="bar-fill" style="width: ${res.confidence}"></div>
           </div>
-          <div style="font-size: 0.8rem; color: #718096; margin-top: 10px;">
-            Analysis Type: ${res.type.toUpperCase()}
+          <div class="analysis-type">
+            Scan Logic: ${res.type}
           </div>
         `;
       }
@@ -264,6 +302,7 @@
         resultArea.innerHTML = '<div id="status-text"></div>';
       }
 
+      // Initialize the model on startup
       window.onload = () => {
         eel.load_system()();
       };
