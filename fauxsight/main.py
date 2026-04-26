@@ -49,7 +49,7 @@ def predict_image(img_source):
             raise FileNotFoundError(f"Image file not found: {img_path}")
         img = cv2.imread(img_path)
 
-    img = cv2.resize(img, (32, 32)).astype('float32') / 255.0
+    img = cv2.resize(img, (224, 224)).astype('float32') / 255.0
     prob = float(model.predict(np.expand_dims(img, 0), verbose=0)[0][0])
 
     label = "AI-Generated" if prob >= 0.5 else "Real"
@@ -78,7 +78,7 @@ def predict_video(video_path, frame_skip=10):
         # Process every Nth frame
         if frame_idx % frame_skip == 0:
             try:
-                frame_resized = cv2.resize(frame, (32, 32)).astype('float32') / 255.0
+                frame_resized = cv2.resize(frame, (224, 224)).astype('float32') / 255.0
                 prob = float(model.predict(np.expand_dims(frame_resized, 0), verbose=0)[0][0])
                 predictions.append(prob)
             except:
@@ -105,7 +105,7 @@ def predict_video(video_path, frame_skip=10):
 @eel.expose
 def load_system():
     print("Initializing system...")
-    dummy = np.zeros((1, 32, 32, 3), dtype=np.float32)
+    dummy = np.zeros((1, 224, 224, 3), dtype=np.float32)
     model.predict(dummy, verbose=0)
     print("System ready!")
     return {"status": "ready"}
