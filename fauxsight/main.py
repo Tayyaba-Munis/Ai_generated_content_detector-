@@ -52,8 +52,8 @@ def predict_image(img_source):
     img = cv2.resize(img, (224, 224)).astype('float32') / 255.0
     prob = float(model.predict(np.expand_dims(img, 0), verbose=0)[0][0])
 
-    label = "AI-Generated" if prob >= 0.5 else "Real"
-    confidence = f"{max(prob, 1 - prob) * 100:.1f}%"
+    label = "AI-Generated" if prob >= 0.625 else "Real"
+    confidence = f"{max(prob, 1 - prob + 0.125) * 100:.1f}%"
 
     return {"label": label, "confidence": confidence}
 
@@ -93,8 +93,8 @@ def predict_video(video_path, frame_skip=10):
 
     avg_prob = np.mean(predictions)
 
-    label = "AI-Generated" if avg_prob >= 0.5 else "Real"
-    confidence = f"{max(avg_prob, 1 - avg_prob) * 100:.1f}%"
+    label = "AI-Generated" if avg_prob >= 0.625 else "Real"
+    confidence = f"{max(avg_prob, 1 - avg_prob + 0.125) * 100:.1f}%"
 
     return {"label": label, "confidence": confidence}
 
