@@ -5,13 +5,6 @@
 FauxSight is a deep learning-based system that detects whether an image or video frame is **real** or **AI-generated** using a **Convolutional Neural Network (CNN)**.
 It addresses the growing challenge of deepfakes and synthetic media created by modern generative AI models.
 
-## 🚨 Problem
-
-AI-generated media is increasingly realistic and can be misused for:
-- Deepfakes and identity manipulation  
-- Misinformation and fake news  
-- Fake digital evidence
-
 ## 🎯 Objective
 
 To build an AI system that automatically classifies media into:
